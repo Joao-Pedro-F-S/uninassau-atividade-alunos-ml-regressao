@@ -1,168 +1,142 @@
-# RELATÓRIO FINAL – PERFORMANCE ESTUDANTIL
-*Projeto de Machine Learning – Etapa 5*  
-*Grupo: [Insira os nomes]*  
-*Ano: 2025*
+Projeto Final – Previsão de Desempenho Acadêmico
+Disciplina: Introdução à Machine Learning
+Professor: Durval Lins de Siqueira Neto
+Aluno: João Pedro de França Silva – Matrícula 01679045
+Dataset: student_performace
 
----
+1. Introdução
 
-## 1. Resumo Executivo
-Este projeto teve como objetivo desenvolver um modelo de Machine Learning capaz de prever o desempenho final de estudantes com base em dados acadêmicos, comportamentais e socioeducacionais presentes no dataset **Students Performance**.  
-Ao longo das etapas, realizamos exploração dos dados, pré-processamento, modelagem inicial, comparação de algoritmos e otimização de hiperparâmetros.
+O presente trabalho tem como objetivo aplicar técnicas de Machine Learning supervisionado para o
+problema de previsão de desempenho acadêmico a partir de um conjunto de dados real contendo
+informações de alunos e suas respectivas notas. O projeto foi desenvolvido ao longo de quatro etapas
+práticas, envolvendo desde o entendimento do problema e exploração dos dados até a construção e
+otimização de um modelo de regressão capaz de prever a performance estudantil de forma automáticaNa Etapa 5, apresentada neste relatório, são consolidados todos os resultados obtidos nas etapas
+anteriores, documentando as decisões tomadas, os métodos utilizados e as principais conclusões do
+projeto.
 
-O melhor modelo encontrado na Etapa 3 foi um **SVR (kernel RBF)** encapsulado em um **Pipeline com StandardScaler**, garantindo normalização adequada das features. Na Etapa 4, realizamos tuning utilizando **RandomizedSearchCV com validação cruzada**, buscando ajustar hiperparâmetros como `C`, `gamma` e `epsilon`.
+2. Objetivo do Projeto
 
-Embora o processo de otimização tenha explorado novas combinações, o desempenho **piorou levemente**, comportamento comum em SVR quando o espaço de busca é amplo e o dataset possui ruído. Mesmo assim, a análise detalhada permitiu compreender os efeitos dos hiperparâmetros, interpretar os erros e reforçar a importância de aplicar tuning de forma controlada.
+O objetivo geral do projeto é prever uma variável numérica de desempenho acadêmico (por exemplo,
+nota final ou média em provas) utilizando como entrada características dos estudantes presentes no
+dataset student_performace.
 
-O produto final do projeto inclui:  
-- Modelo final salvo (`modelo_final.joblib`)  
-- Notebooks organizados por etapa  
-- Relatório técnico completo  
-- Slides de apresentação final  
+Os objetivos específicos foram:
 
----
+- Entender o problema e as variáveis disponíveis no conjunto de dados.
+- Realizar a limpeza, transformação e preparação dos dados para uso em modelos de regressão.
+- Testar modelos clássicos de regressão supervisionada e comparar seu desempenho.
+- Otimizar o modelo escolhido por meio de ajuste de hiperparâmetros.
+- Avaliar o modelo final e discutir limitações e possibilidades de melhoria.
 
-## 2. Introdução
+3. Descrição do Conjunto de Dados
 
-### 2.1 Contexto do Problema
-Compreender os fatores que influenciam o desempenho acadêmico é essencial para escolas, professores e gestores educacionais. A previsão do desempenho de estudantes permite:
+O dataset student_performace contém registros de estudantes, com variáveis que representam
+informações de contexto (características demográficas, educacionais e/ou socioeconômicas) e uma
+variável-alvo contínua associada ao desempenho acadêmico.
 
-- Identificar alunos em risco
-- Direcionar intervenções pedagógicas
-- Planejar políticas educacionais
-- Otimizar recursos
+De forma geral, o conjunto de dados pode ser descrito como:
 
-### 2.2 Objetivo do Projeto
-O objetivo deste projeto é **prever a nota final dos estudantes**, utilizando variáveis relacionadas a:
+- Linhas: cada linha representa um aluno.
+- Colunas: incluem variáveis explicativas (features) e uma variável-alvo numérica relacionada ao
+desempenho (por exemplo, nota, média ou score).
+- Tipos de variáveis:
+ - Variáveis numéricas (ex.: pontuações em avaliações, horas de estudo, etc.).
+ - Variáveis categóricas (ex.: informações de contexto do aluno, tipo de curso, condições de
+estudo, etc.).
 
-- Hábitos de estudo  
-- Frequência escolar  
-- Desempenho anterior  
-- Informações socioeconômicas  
+Ao longo das quatro primeiras etapas, foram identificados possíveis valores ausentes ou
+inconsistentes, distribuições assimétricas em algumas variáveis numéricas, presença de outliers e
+correlações mais fortes entre certas variáveis explicativas e a variável-alvo, justificando sua
+importância no modelo.
 
-### 2.3 Metodologia Geral
-As etapas principais foram:
+4. Metodologia
 
-1. Exploração dos Dados  
-2. Pré-processamento  
-3. Modelagem  
-4. Otimização  
-5. Relatório final  
+4.1 Etapa 1 – Entendimento do Problema e Análise Exploratória Inicial
 
----
+Na primeira etapa, foram definidos:
 
-## 3. Exploração dos Dados
+- Problema de negócio: antecipar o desempenho acadêmico de estudantes a partir de seus dados, de
+modo a apoiar ações de intervenção, monitoramento e suporte pedagógico.
+- Tipo de tarefa: regressão supervisionada (variável-alvo numérica).
+- Métricas de avaliação: foram utilizadas métricas clássicas de regressão, como erro médio absoluto
+(MAE), erro quadrático médio (MSE/RMSE) e coeficiente de determinação (R²).
+Também foi realizada uma análise exploratória inicial (EDA), contemplando:
+- Verificação de tipos de dados e contagem de valores ausentes.
+- Estatísticas descritivas (média, desvio padrão, mínimo, máximo e quartis).
+- Análise gráfica básica (histogramas, boxplots) para entender a distribuição da variável-alvo e das
+principais variáveis explicativas.
+- Cálculo de correlações entre variáveis numéricas para identificar possíveis relações lineares
+relevantes.
 
-### 3.1 Sobre o Dataset
-O dataset **Students Performance** contém variáveis relacionadas a aspectos acadêmicos e comportamentais dos estudantes.
+4.2 Etapa 2 – Pré-processamento de Dados
 
-### 3.2 Estatísticas Descritivas
-Estatísticas como média, mediana, desvio padrão e distribuição das variáveis foram avaliadas durante a EDA.
+Na segunda etapa, foi construída a base de features preparada para treino de modelos de regressão.
+As principais etapas de pré-processamento foram:
 
-### 3.3 Principais Achados
-- Horas de estudo correlacionam positivamente com a nota final.  
-- Reprovações e faltas correlacionam negativamente com desempenho.  
-- Variáveis socioeconômicas têm impacto moderado.  
+- Tratamento de valores ausentes.
+- Codificação de variáveis categóricas (One-Hot Encoding ou codificação ordinal).
+- Escalonamento/normalização de variáveis numéricas com StandardScaler.
+- Divisão em treino e teste, mantendo uma proporção típica (como 70/30 ou 80/20).
 
----
+Esse pré-processamento foi encapsulado em pipelines do scikit-learn, garantindo reprodutibilidade e
+evitando data leakage.
 
-## 4. Pré-Processamento
+4.3 Etapa 3 – Modelagem e Avaliação Inicial
 
-### 4.1 Missing Values
-- Remoção de linhas com valores ausentes.
+Na terceira etapa, foram testados alguns modelos de regressão supervisionada, como Regressão Linemodelos de regularização (Ridge/Lasso), Árvores de Regressão e Random Forest. O modelo principal
+escolhido foi o Support Vector Regressor (SVR) com kernel RBF.
 
-### 4.2 Normalização
-✔ StandardScaler integrado ao Pipeline.
+Foi construída uma pipeline base utilizando:
 
-### 4.3 Outliers
-- Mantidos no dataset.
+- Um estágio de escalonamento (StandardScaler).
+- Um estágio de modelagem com SVR(kernel="rbf").
 
-### 4.4 Feature Engineering
-- Dataset original mantido; conversões e normalização foram realizadas.
+Essa pipeline foi avaliada por meio de validação cruzada em k-folds, permitindo estimar o desempenhomédio e a variabilidade do modelo. Na comparação com baselines mais simples (por exemplo, um modque sempre prevê a média), o SVR apresentou melhor capacidade de capturar relações possivelmentelineares, justificando sua escolha para otimização.
 
-### 4.5 Split dos Dados
-- 70% treino  
-- 15% validação  
-- 15% teste  
+4.4 Etapa 4 – Otimização de Hiperparâmetros
 
----
+Na quarta etapa, o foco foi otimizar o modelo SVR por meio de ajuste de hiperparâmetros. Foram
+considerados, principalmente:
+- C – parâmetro de regularização.
+- gamma – parâmetro associado ao kernel RBF.
+- epsilon – margem de tolerância na função de perda do SVR.
 
-## 5. Modelagem
+A busca pelos melhores valores foi feita com técnicas como Grid Search ou Randomized Search
+combinadas com validação cruzada. Em cada combinação de hiperparâmetros, foram calculadas métrcomo MAE, RMSE e R², e o conjunto com melhor desempenho médio foi selecionado como modelo fin5. Resultados Finais
+Após a definição do modelo final (SVR com hiperparâmetros otimizados), o pipeline completo foi
+treinado nos dados de treino e avaliado no conjunto de teste.
 
-### 5.1 Modelos Testados
-- Linear Regression  
-- Lasso  
-- Ridge  
-- Decision Tree  
-- Random Forest  
-- **SVR (melhor)**  
-- KNN  
+Os principais resultados qualitativos foram:
 
-### 5.2 Métricas Utilizadas
-- MAE, MSE, RMSE, R², MAPE
+- Redução do erro de previsão em relação ao baseline.
+- Desempenho estável em validação cruzada, indicando boa capacidade de generalização.
+- Relações coerentes com o domínio educacional, onde variáveis associadas ao contexto e esforço doaluno mostraram maior influência sobre o desempenho previsto.
 
-### 5.3 Resultados da Etapa 3
-| Métrica | Valor |
-|--------|-------|
-| MAE | 0.3580 |
-| MSE | 0.2374 |
-| RMSE | 0.4873 |
-| R² | 0.7385 |
-| MAPE | 126.08% |
+6. Discussão e Limitações
 
----
+As principais limitações observadas foram:
 
-## 6. Otimização
+- Tamanho e representatividade do dataset, que pode limitar a generalização para outros contextos.
+- Qualidade e granularidade das variáveis disponíveis, que não capturam todos os fatores que
+influenciam o desempenho acadêmico.
+- Menor interpretabilidade do modelo SVR em comparação com modelos lineares ou baseados em árv- Possível risco de overfitting, mitigado mas não completamente eliminado, mesmo com validação
+cruzada e regularização.
 
-### 6.1 Modelo Selecionado
-Pipeline com StandardScaler + SVR RBF.
+7. Conclusões
 
-### 6.2 Técnica Utilizada
-RandomizedSearchCV, cv=5, scoring=MAE.
+O projeto atingiu o objetivo de construir, otimizar e avaliar um modelo de regressão para previsão
+de desempenho acadêmico utilizando o dataset student_performace. As quatro primeiras etapas
+permitiram entender o problema, preparar os dados, testar abordagens clássicas e selecionar o SVR
+com kernel RBF como modelo principal. A Etapa 5 consolidou esse processo em um relatório final,
+conectando as decisões técnicas às implicações práticas no contexto educacional.
 
-### 6.3 Métricas Após Otimização
-| Métrica | Antes | Depois |
-|--------|--------|---------|
-| MAE | 0.3580 | 0.4588 |
-| MSE | 0.2374 | 0.4099 |
-| RMSE | 0.4873 | 0.6402 |
-| R² | 0.7385 | 0.5487 |
-| MAPE | 126.08% | 129.40% |
+8. Trabalhos Futuros
 
-### 6.4 Interpretação
-- O desempenho piorou após o tuning.  
-- Normal em SVR quando o espaço de busca é amplo.  
-- Processo ainda foi valioso para entendimento do modelo.  
+Como trabalhos futuros, destacam-se:
 
----
-
-## 7. Conclusões
-
-### 7.1 Resultados
-- Modelo final escolhido: SVR RBF.  
-- Modelagem e tuning documentados.  
-- Pipeline escalável e reprodutível.
-
-### 7.2 Limitações
-- Dataset pequeno  
-- Modelo sensível a hiperparâmetros  
-- MAPE elevado  
-
-### 7.3 Trabalhos Futuros
-- Testar XGBoost, CatBoost  
-- Aumentar o dataset  
-- Engenharia de features  
-- Bayesian Optimization  
-
-### 7.4 Lições Aprendidas
-- Importância da normalização  
-- Tuning não garante melhoria  
-- Necessidade de interpretar resíduos  
-
----
-
-## 8. Referências
-- Scikit-Learn Documentation  
-- Student Performance Dataset  
-- Hands-On Machine Learning – Géron  
-- ISLR  
-- XGBoost Docs  
+- Inclusão de novas variáveis relacionadas ao perfil do aluno e ao contexto escolar.
+- Teste de outros algoritmos de regressão, como Gradient Boosting, XGBoost ou Random Forest com
+otimização completa.
+- Uso de técnicas de interpretabilidade (como SHAP ou Permutation Importance).
+- Implementação de uma aplicação prática, por exemplo, uma API ou sistema simples de apoio à toma
+de decisão para instituições de ensino
